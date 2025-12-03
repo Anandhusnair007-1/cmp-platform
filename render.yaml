@@ -1,0 +1,50 @@
+services:
+  # Backend - Inventory Service
+  - type: web
+    name: cmp-inventory
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.inventory
+    envVars:
+      - key: PORT
+        value: 8081
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cmp-postgres
+          property: connectionString
+
+  # Backend - Issuer Service
+  - type: web
+    name: cmp-issuer
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.issuer
+    envVars:
+      - key: PORT
+        value: 8082
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cmp-postgres
+          property: connectionString
+
+  # Backend - Adapter Service
+  - type: web
+    name: cmp-adapter
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.adapter
+    envVars:
+      - key: PORT
+        value: 8083
+
+  # Frontend
+  - type: web
+    name: cmp-frontend
+    runtime: static
+    buildCommand: cd frontend/webapp && npm install && npm run build
+    staticPublishPath: ./frontend/webapp/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://cmp-inventory.onrender.com
+
+databases:
+  - name: cmp-postgres
+    databaseName: cmp
+    user: cmp
