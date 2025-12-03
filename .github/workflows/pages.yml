@@ -1,0 +1,236 @@
+name: Deploy Documentation to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Create docs site
+        run: |
+          mkdir -p _site
+          
+          # Copy README as index
+          cp README.md _site/index.md
+          
+          # Copy documentation
+          cp -r docs _site/ 2>/dev/null || true
+          
+          # Create index.html
+          cat > _site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>CMP Platform - Certificate Management Platform</title>
+              <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                      line-height: 1.6;
+                      color: #333;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      min-height: 100vh;
+                      padding: 20px;
+                  }
+                  .container {
+                      max-width: 1200px;
+                      margin: 0 auto;
+                      background: white;
+                      border-radius: 10px;
+                      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                      overflow: hidden;
+                  }
+                  header {
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      padding: 60px 40px;
+                      text-align: center;
+                  }
+                  h1 { font-size: 3em; margin-bottom: 10px; }
+                  .subtitle { font-size: 1.2em; opacity: 0.9; }
+                  .content {
+                      padding: 40px;
+                  }
+                  .features {
+                      display: grid;
+                      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                      gap: 30px;
+                      margin: 40px 0;
+                  }
+                  .feature {
+                      padding: 30px;
+                      background: #f7fafc;
+                      border-radius: 8px;
+                      border-left: 4px solid #667eea;
+                  }
+                  .feature h3 { color: #667eea; margin-bottom: 10px; }
+                  .cta {
+                      display: flex;
+                      gap: 20px;
+                      justify-content: center;
+                      margin: 40px 0;
+                      flex-wrap: wrap;
+                  }
+                  .btn {
+                      display: inline-block;
+                      padding: 15px 30px;
+                      background: #667eea;
+                      color: white;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      font-weight: 600;
+                      transition: transform 0.2s, box-shadow 0.2s;
+                  }
+                  .btn:hover {
+                      transform: translateY(-2px);
+                      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+                  }
+                  .btn-secondary {
+                      background: #48bb78;
+                  }
+                  pre {
+                      background: #2d3748;
+                      color: #e2e8f0;
+                      padding: 20px;
+                      border-radius: 5px;
+                      overflow-x: auto;
+                      margin: 20px 0;
+                  }
+                  code { font-family: 'Courier New', monospace; }
+                  footer {
+                      background: #2d3748;
+                      color: white;
+                      padding: 20px;
+                      text-align: center;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <header>
+                      <h1>🔐 CMP Platform</h1>
+                      <p class="subtitle">Production-Grade Certificate Management Platform</p>
+                      <p>Automate TLS/SSL certificate lifecycle across cloud, on-prem, and hybrid environments</p>
+                  </header>
+                  
+                  <div class="content">
+                      <div class="cta">
+                          <a href="https://github.com/Anandhusnair007-1/cmp-platform" class="btn">View on GitHub</a>
+                          <a href="https://github.com/Anandhusnair007-1/cmp-platform/archive/refs/heads/main.zip" class="btn btn-secondary">Download</a>
+                      </div>
+
+                      <h2>✨ Features</h2>
+                      <div class="features">
+                          <div class="feature">
+                              <h3>🔄 Automated Lifecycle</h3>
+                              <p>Automated discovery, issuance, renewal, revocation, and deployment of certificates</p>
+                          </div>
+                          <div class="feature">
+                              <h3>🔌 Pluggable Adapters</h3>
+                              <p>Support for Vault PKI, ACME/Let's Encrypt, and extensible adapter framework</p>
+                          </div>
+                          <div class="feature">
+                              <h3>🚀 Production Ready</h3>
+                              <p>Docker Compose, Kubernetes Helm charts, CI/CD pipelines, and comprehensive testing</p>
+                          </div>
+                          <div class="feature">
+                              <h3>🔐 Enterprise Security</h3>
+                              <p>mTLS, RBAC, audit logging, HSM integration support, and secrets management</p>
+                          </div>
+                          <div class="feature">
+                              <h3>📊 Monitoring</h3>
+                              <p>Prometheus metrics, Grafana dashboards, structured logging, and health checks</p>
+                          </div>
+                          <div class="feature">
+                              <h3>🎨 Modern Stack</h3>
+                              <p>Go backend services, React TypeScript frontend, PostgreSQL, Redis, Vault</p>
+                          </div>
+                      </div>
+
+                      <h2>🚀 Quick Start</h2>
+                      <pre><code># Clone the repository
+git clone https://github.com/Anandhusnair007-1/cmp-platform.git
+cd cmp-platform
+
+# Start all services with Docker Compose
+docker-compose -f deploy/docker-compose.yml up --build
+
+# Run database migrations
+make migrate-up
+
+# Access the services
+# Frontend: http://localhost:3000
+# API: http://localhost:8080/api/v1
+# Vault UI: http://localhost:8200</code></pre>
+
+                      <h2>🏗️ Architecture</h2>
+                      <div class="feature">
+                          <h3>Backend Services (Go)</h3>
+                          <ul>
+                              <li><strong>Inventory Service</strong>: Certificate discovery and management</li>
+                              <li><strong>Issuer Service</strong>: Certificate issuance and lifecycle</li>
+                              <li><strong>Adapter Service</strong>: CA integration layer</li>
+                          </ul>
+                      </div>
+
+                      <div class="feature">
+                          <h3>Infrastructure</h3>
+                          <ul>
+                              <li><strong>Database</strong>: PostgreSQL with migrations</li>
+                              <li><strong>Cache</strong>: Redis for performance</li>
+                              <li><strong>Secrets</strong>: HashiCorp Vault integration</li>
+                              <li><strong>Deployment</strong>: Docker, Kubernetes, Terraform</li>
+                          </ul>
+                      </div>
+
+                      <h2>📚 Documentation</h2>
+                      <ul>
+                          <li><a href="https://github.com/Anandhusnair007-1/cmp-platform/blob/main/README.md">Getting Started</a></li>
+                          <li><a href="https://github.com/Anandhusnair007-1/cmp-platform/blob/main/docs/architecture.md">Architecture</a></li>
+                          <li><a href="https://github.com/Anandhusnair007-1/cmp-platform/blob/main/docs/runbooks.md">Runbooks</a></li>
+                          <li><a href="https://github.com/Anandhusnair007-1/cmp-platform/blob/main/api/openapi.yaml">API Documentation</a></li>
+                      </ul>
+
+                      <h2>🤝 Contributing</h2>
+                      <p>Contributions are welcome! Please check out our <a href="https://github.com/Anandhusnair007-1/cmp-platform">GitHub repository</a> for more information.</p>
+                  </div>
+
+                  <footer>
+                      <p>© 2025 CMP Platform | <a href="https://github.com/Anandhusnair007-1/cmp-platform" style="color: #90cdf4;">GitHub</a> | MIT License</p>
+                  </footer>
+              </div>
+          </body>
+          </html>
+          EOF
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
