@@ -1,0 +1,8 @@
+{
+  "name": "cmp-platform",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend/webapp && npm install && npm run build",
+    "start": "cd backend && go run ./cmd/inventory-service"
+  }
+}
